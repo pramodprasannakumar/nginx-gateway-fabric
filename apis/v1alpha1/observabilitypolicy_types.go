@@ -5,7 +5,6 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
-// +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:deprecatedversion:warning="The 'v1alpha1' version of ObservabilityPolicy API is deprecated, please migrate to 'v1alpha2'."
 // +kubebuilder:subresource:status

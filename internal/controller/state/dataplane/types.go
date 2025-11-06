@@ -26,41 +26,24 @@ const (
 
 // Configuration is an intermediate representation of dataplane configuration.
 type Configuration struct {
-	// AuxiliarySecrets contains additional secret data, like certificates/keys/tokens that are not related to
-	// Gateway API resources.
-	AuxiliarySecrets map[graph.SecretFileType][]byte
-	// CertBundles holds all unique Certificate Bundles.
-	CertBundles map[CertBundleID]CertBundle
-	// BaseStreamConfig holds the configuration options at the stream context.
-	BaseStreamConfig BaseStreamConfig
-	// SSLKeyPairs holds all unique SSLKeyPairs.
-	SSLKeyPairs map[SSLKeyPairID]SSLKeyPair
-	// DeploymentContext contains metadata about NGF and the cluster.
-	DeploymentContext DeploymentContext
-	// Logging defines logging related settings for NGINX.
-	Logging Logging
-	// StreamUpstreams holds all unique stream Upstreams
-	StreamUpstreams []Upstream
-	// TLSPassthroughServers hold all TLSPassthroughServers
+	AuxiliarySecrets      map[graph.SecretFileType][]byte
+	CertBundles           map[CertBundleID]CertBundle
+	BaseStreamConfig      BaseStreamConfig
+	SSLKeyPairs           map[SSLKeyPairID]SSLKeyPair
+	DeploymentContext     DeploymentContext
+	Logging               Logging
+	WAF                   WAFConfig
+	BackendGroups         []BackendGroup
 	TLSPassthroughServers []Layer4VirtualServer
-	// BackendGroups holds all unique BackendGroups.
-	BackendGroups []BackendGroup
-	// MainSnippets holds all the snippets that apply to the main context.
-	MainSnippets []Snippet
-	// Upstreams holds all unique http Upstreams.
-	Upstreams []Upstream
-	// NginxPlus specifies NGINX Plus additional settings.
-	NginxPlus NginxPlus
-	// SSLServers holds all SSLServers.
-	SSLServers []VirtualServer
-	// HTTPServers holds all HTTPServers.
-	HTTPServers []VirtualServer
-	// Telemetry holds the Otel configuration.
-	Telemetry Telemetry
-	// BaseHTTPConfig holds the configuration options at the http context.
-	BaseHTTPConfig BaseHTTPConfig
-	// WorkerConnections specifies the maximum number of simultaneous connections that can be opened by a worker process.
-	WorkerConnections int32
+	MainSnippets          []Snippet
+	Upstreams             []Upstream
+	NginxPlus             NginxPlus
+	SSLServers            []VirtualServer
+	HTTPServers           []VirtualServer
+	StreamUpstreams       []Upstream
+	Telemetry             Telemetry
+	BaseHTTPConfig        BaseHTTPConfig
+	WorkerConnections     int32
 }
 
 // SSLKeyPairID is a unique identifier for a SSLKeyPair.
@@ -73,6 +56,13 @@ type CertBundleID string
 
 // CertBundle is a Certificate bundle.
 type CertBundle []byte
+
+// WAFBundleID is a unique identifier for a WAF bundle.
+// The ID is safe to use as a file name.
+type WAFBundleID string
+
+// WAFBundle is a WAF bundle.
+type WAFBundle []byte
 
 // SSLKeyPair is an SSL private/public key pair.
 type SSLKeyPair struct {
@@ -495,4 +485,13 @@ type DeploymentContext struct {
 	ClusterNodeCount *int `json:"cluster_node_count,omitempty"`
 	// Integration is "ngf".
 	Integration string `json:"integration"`
+}
+
+// WAFConfig holds the WAF configuration for the dataplane.
+// It is used to determine whether WAF is enabled and to load the WAF module, as well as storing the WAFBundles.
+type WAFConfig struct {
+	// WAFBundles are the WAF Policy Bundles to be stored in the app_protect bundles directory.
+	WAFBundles map[WAFBundleID]WAFBundle
+	// Enabled indicates whether WAF is enabled.
+	Enabled bool
 }
